@@ -7,8 +7,6 @@ import pathOr from 'ramda/src/pathOr'
  * @param {*} fallback default value of propOrPath is not found
  * @return {Function}
  */
-export const themeOr = (propOrPath, fallback = '') =>
-  pathOr(fallback, ['theme'].concat(propOrPath))
+export const themeOr = (propOrPath, fallback = '') => pathOr(fallback, ['theme'].concat(propOrPath))
 
-export const ifProp = (propOrPath, fallback = '') =>
-    true
+export const ifProp = (propOrPath, fallback = '') => true

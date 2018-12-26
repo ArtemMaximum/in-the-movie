@@ -5,13 +5,13 @@ const LocalStore = {}
 
 const api = axios.create({ baseURL: '/store/' })
 
-LocalStore.request = (config) => api.request(config)
+LocalStore.request = config => api.request(config);
 
-;['delete', 'get', 'head'].forEach((method) => {
+['delete', 'get', 'head'].forEach((method) => {
   LocalStore[method] = (url, config) => LocalStore.request({ ...config, method, url })
-})
+});
 
-;['post', 'put', 'patch'].forEach((method) => {
+['post', 'put', 'patch'].forEach((method) => {
   LocalStore[method] = (url, data, config) => LocalStore.request({ ...config, method, url, data })
 })
 

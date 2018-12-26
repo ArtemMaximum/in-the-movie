@@ -10,21 +10,21 @@ module.exports = {
   name: 'task-manager',
   context: resolve(__dirname, '..', 'src'),
   target: 'web',
-  
+
   entry: {
     index: [],
     polyfill: [
       'babel-polyfill',
     ],
   },
-  
+
   output: {
     path: resolve(__dirname, '..', 'dist'),
     filename: 'js/[name]-[hash].js',
     publicPath: '/',
     pathinfo: false,
   },
-  
+
   resolve: {
     extensions: ['.jsx', '.js'],
     modules: [
@@ -33,7 +33,7 @@ module.exports = {
       'node_modules',
     ],
   },
-  
+
   module: {
     rules: [
       {
@@ -45,15 +45,15 @@ module.exports = {
       {
         test: /\.css$/,
         // exclude: /node_modules/,
-        loaders: ['style-loader', 'css-loader']
+        loaders: ['style-loader', 'css-loader'],
       },
       {
         test: /\.(gif|jpe?g|png)$/,
         loader: 'url-loader?limit=25000',
         query: {
           limit: 10000,
-          name: 'static/media/images/[name].[hash:8].[ext]'
-        }
+          name: 'static/media/images/[name].[hash:8].[ext]',
+        },
       },
       {
         test: /\.json$/,
@@ -68,11 +68,11 @@ module.exports = {
         use: 'text-loader',
       },
       {
-        test: /\.woff(2)?(\?v=[0-9]\.[0-9]\.[0-9])?$/,
+        test: /\.woff(2)?(\?v=\d\.\d\.\d)?$/,
         loader: 'url-loader?limit=10000&mimetype=application/font-woff',
         query: {
-          name: 'static/media/files/[name].[hash:8].[ext]'
-        }
+          name: 'static/media/files/[name].[hash:8].[ext]',
+        },
       },
       {
         test: /\.svg$/,
@@ -93,7 +93,7 @@ module.exports = {
       },
     ],
   },
-  
+
   plugins: [
     new HtmlPlugin({
       template: resolve(__dirname, '..', 'src', 'index.html'),
