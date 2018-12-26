@@ -32,7 +32,7 @@ export const RootWrapper = styled.div`
   width: 100%;
 `
 
-export const RootTemplate = ({ children, backgroundImage }) => (
+export const RootTemplate = ({ children }) => (
   <RootWrapper>
     <BackgroundImage style={{ backgroundImage: `url(${scheme.ui.backgroundImage})` }} />
     {children}
@@ -43,7 +43,5 @@ RootTemplate.propTypes = {
   children: PropTypes.node.isRequired,
 }
 
-RootTemplate.defaultProps = {
-  backgroundImage: scheme.ui.backgroundImage,
-}
+RootTemplate.defaultProps = {}
 
