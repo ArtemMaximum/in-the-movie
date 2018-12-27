@@ -11,7 +11,7 @@ import configureStore from './configure-store'
 const store = configureStore()
 
 export default () => (
-  <RootTemplate sidebar="Hello">
+  <RootTemplate sidebar="Sidebar">
     <Provider store={store}>
       <Switch>
         <Route exact path="/" component={MoviesList} />

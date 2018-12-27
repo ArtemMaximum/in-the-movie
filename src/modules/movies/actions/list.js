@@ -4,6 +4,8 @@ import {
   FETCH_MOVIES_LIST_START,
   FETCH_MOVIES_LIST_SUCCESS,
   FETCH_MOVIES_LIST_FAILURE,
+
+  CLEAR_MOVIES_LIST,
 } from '../action-types';
 
 
@@ -39,4 +41,44 @@ export function fetchMoviesList(page = 1, isReplaced = false) {
   };
 }
 
-export default [fetchMoviesList];
+
+export function searchMoviesList(query, isReplaced = true) {
+  return (dispatch) => {
+    if (query.length < 1) {
+      dispatch({
+        type: CLEAR_MOVIES_LIST,
+      });
+
+      return dispatch(fetchMoviesList())
+    }
+    dispatch({
+      type: FETCH_MOVIES_LIST_START,
+    });
+
+    return api.get('/search/movie', {
+      params: {
+        query,
+      },
+    }).then(({ data }) => {
+      if (!data.status_code) {
+        dispatch({
+          type: FETCH_MOVIES_LIST_SUCCESS,
+          data: data.results,
+          pagination: {
+            page: data.page,
+            totalPages: data.total_pages,
+            totalResults: data.total_results,
+          },
+          isReplaced,
+        });
+      } else {
+        dispatch({
+          type: FETCH_MOVIES_LIST_FAILURE,
+          errors: data.status_message,
+        });
+      }
+    }).catch(err => console.log('Error: ', err)); // eslint-disable-line unicorn/catch-error-name
+  };
+}
+
+export default [fetchMoviesList, searchMoviesList];

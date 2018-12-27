@@ -17,7 +17,7 @@ import {
 } from 'reactstrap'
 
 import { connect } from 'react-redux'
-import { fetchMoviesList } from '../actions/list'
+import { fetchMoviesList, searchMoviesList } from '../actions/list'
 import { fetchGenresList } from '../../genres/actions/list'
 import { ContentTemplate } from '../../../ui'
 
@@ -26,17 +26,17 @@ class MoviesList extends PureComponent {
   constructor(props) {
     super(props)
 
-    this.state = {}
+    this.state = { searchValue: '' }
   }
 
   componentDidMount() {
-    this.props.fetchMoviesList()
-    this.props.fetchGenresList()
+    this.props.fetchMovies()
+    this.props.fetchGenres()
   }
 
   render() {
     const {
-      movies, genres, /* pagination, isLoading*/
+      movies, genres, searchMovies, /* pagination, isLoading*/
     } = this.props
 
     // console.log('\n ... movies ...', movies)
@@ -56,12 +56,16 @@ class MoviesList extends PureComponent {
               this.setState({
                 searchValue: e.target.value,
               })
-              console.log(`/search/movie&query=${e.target.value}`)
-              // rest.fetchGroupsList(e.target.value, undefined, true)
+              searchMovies(e.target.value)
             }}
           />
           <InputGroupAddon addonType="append">
-            <Button color="inverse">
+            <Button
+              color="inverse"
+              onClick={() => {
+                searchMovies(this.state.searchValue)
+              }}
+            >
               Найти
             </Button>
           </InputGroupAddon>
@@ -102,8 +106,9 @@ class MoviesList extends PureComponent {
 
 function mapDispatchToProps(dispatch) {
   return {
-    fetchMoviesList: bindActionCreators(fetchMoviesList, dispatch),
-    fetchGenresList: bindActionCreators(fetchGenresList, dispatch),
+    fetchMovies: bindActionCreators(fetchMoviesList, dispatch),
+    searchMovies: bindActionCreators(searchMoviesList, dispatch),
+    fetchGenres: bindActionCreators(fetchGenresList, dispatch),
   }
 }
 
