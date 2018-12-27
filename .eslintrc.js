@@ -37,7 +37,8 @@ module.exports = {
     "no-trailing-space": 0,
     "spaced-comment": 0,
     "no-useless-constructor": 0,
-    "import/no-extraneous-dependencies": ["error", {"devDependencies": true}]
+    "import/no-extraneous-dependencies": ["error", {"devDependencies": true}],
+    "function-paren-newline": 0,
   },
 
   settings: {
