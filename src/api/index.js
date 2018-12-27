@@ -1,9 +1,14 @@
 import axios from 'axios'
-// import { checkExpires, manageHeaders } from 'lib/api-utils'
+
 
 const LocalStore = {}
 
-const api = axios.create({ baseURL: '/store/' })
+const api = axios.create({
+  baseURL: 'https://api.themoviedb.org/3',
+  params: {
+    api_key: 'c4b50bad048769fabdb6f46d0cca11cb',
+  },
+})
 
 LocalStore.request = config => api.request(config);
 
