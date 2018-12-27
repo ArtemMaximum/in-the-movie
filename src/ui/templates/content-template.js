@@ -2,7 +2,7 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import styled from 'styled-components'
 
-import { width, mediaMaxWidth } from 'lib/sizes'
+import { width, mediaMaxWidth } from '../../lib/sizes'
 
 
 const ContentTemplateContainer = styled.div`
@@ -36,3 +36,5 @@ export const ContentTemplate = styled(ContentConstructor)`
 ContentTemplate.propTypes = {
   children: PropTypes.node.isRequired,
 }
+
+export default [ContentTemplate]

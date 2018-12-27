@@ -1,11 +1,11 @@
-import configureStore from 'configure-store'
 import React from 'react'
-
-import { Provider } from 'react-redux'
-import { RootTemplate, NotFoundPage } from 'ui'
 import { Switch, Route } from 'react-router-dom'
 
-import MoviesList from 'modules/movies/containers/list'
+import { Provider } from 'react-redux'
+import { RootTemplate, NotFoundPage } from './ui'
+import MoviesList from './modules/movies/containers/list'
+
+import configureStore from './configure-store'
 
 
 const store = configureStore()

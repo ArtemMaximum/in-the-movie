@@ -17,7 +17,9 @@ LocalStore.request = config => api.request(config);
 });
 
 ['post', 'put', 'patch'].forEach((method) => {
-  LocalStore[method] = (url, data, config) => LocalStore.request({ ...config, method, url, data })
+  LocalStore[method] = (url, data, config) => LocalStore.request({
+    ...config, method, url, data,
+  })
 })
 
 export default LocalStore

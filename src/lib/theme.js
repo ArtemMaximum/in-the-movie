@@ -9,4 +9,4 @@ import pathOr from 'ramda/src/pathOr'
  */
 export const themeOr = (propOrPath, fallback = '') => pathOr(fallback, ['theme'].concat(propOrPath))
 
-export const ifProp = propOrPath => true
+export const ifProp = () => true
