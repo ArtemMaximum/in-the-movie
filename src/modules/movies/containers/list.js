@@ -36,7 +36,7 @@ class MoviesList extends PureComponent {
 
   render() {
     const {
-      movies, genres, pagination, isLoading
+      movies, genres, /* pagination, isLoading*/
     } = this.props
 
     // console.log('\n ... movies ...', movies)
