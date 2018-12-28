@@ -3,6 +3,10 @@ import {
   FETCH_MOVIES_LIST_SUCCESS,
   FETCH_MOVIES_LIST_FAILURE,
 
+  FETCH_RECOMMENDED_MOVIES_LIST_START,
+  FETCH_RECOMMENDED_MOVIES_LIST_SUCCESS,
+  FETCH_RECOMMENDED_MOVIES_LIST_FAILURE,
+
   FETCH_MOVIE_DETAILS_START,
   FETCH_MOVIE_DETAILS_SUCCESS,
   FETCH_MOVIE_DETAILS_FAILURE,
@@ -14,9 +18,12 @@ import {
 const initialState = {
   search: '',
   list: [],
+  recommendedList: [],
   item: {},
   pagination: {},
+  recommendedListPagination: {},
   isLoading: false,
+  isRecommendationsLoading: false,
   errorMessage: '',
 };
 
@@ -33,6 +40,33 @@ const receiveMoviesList = (state, action) => {
         isLoading: false,
       })
     case FETCH_MOVIES_LIST_FAILURE:
+      return Object.assign({}, state, {
+        errorMessage: action.errors,
+        isLoading: false,
+      })
+
+    default:
+      return state
+  }
+};
+
+const receiveRecommendedMoviesList = (state, action) => {
+  switch (action.type) {
+    case FETCH_RECOMMENDED_MOVIES_LIST_START:
+      return Object.assign({}, state, {
+        isLoading: true,
+      })
+    case FETCH_RECOMMENDED_MOVIES_LIST_SUCCESS:
+      return Object.assign({}, state, {
+        recommendedList: action.isReplaced
+          ?
+          action.data
+          :
+          [...state.recommendedList, ...action.data],
+        recommendedListPagination: action.pagination,
+        isRecommendationsLoading: false,
+      })
+    case FETCH_RECOMMENDED_MOVIES_LIST_FAILURE:
       return Object.assign({}, state, {
         errorMessage: action.errors,
         isLoading: false,
@@ -71,6 +105,11 @@ export default function reducer(state = initialState, action) {
     case FETCH_MOVIES_LIST_SUCCESS:
     case FETCH_MOVIES_LIST_FAILURE:
       return receiveMoviesList(state, action)
+
+    case FETCH_RECOMMENDED_MOVIES_LIST_START:
+    case FETCH_RECOMMENDED_MOVIES_LIST_SUCCESS:
+    case FETCH_RECOMMENDED_MOVIES_LIST_FAILURE:
+      return receiveRecommendedMoviesList(state, action)
 
     case FETCH_MOVIE_DETAILS_START:
     case FETCH_MOVIE_DETAILS_SUCCESS:
