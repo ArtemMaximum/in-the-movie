@@ -27,7 +27,15 @@ class MovieDetails extends PureComponent {
   componentDidMount() {
     const { fetchMovie, fetchRecommendedMovies, match: { params: { movieId } } } = this.props;
     fetchMovie(movieId)
-    fetchRecommendedMovies(movieId)
+    fetchRecommendedMovies(movieId, 1, true)
+  }
+
+  componentWillReceiveProps(nextProps) {
+    const { fetchMovie, fetchRecommendedMovies, match: { params: { movieId } } } = this.props;
+    if (movieId !== nextProps.match.params.movieId) {
+      fetchMovie(nextProps.match.params.movieId)
+      fetchRecommendedMovies(nextProps.match.params.movieId, 1, true)
+    }
   }
 
   render() {

@@ -46,6 +46,7 @@ export function fetchMoviesList(page = 1, isReplaced = false) {
 }
 
 export function fetchRecommendedMoviesList(movieId, page, isReplaced = false) {
+  console.log('\n .... isReplaced ...', isReplaced)
   return (dispatch) => {
     dispatch({
       type: FETCH_RECOMMENDED_MOVIES_LIST_START,
@@ -128,6 +129,7 @@ export function loadMoreMovies(query, page = 1, isReplaced = false) {
 }
 
 export function loadMoreRecommendationsList(movieId, page = 1) {
+  console.log('\n ... loadMoreRecommendationsList ...', page)
   return (dispatch) => {
     return dispatch(fetchRecommendedMoviesList(movieId, page))
   }
