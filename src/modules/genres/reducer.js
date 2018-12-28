@@ -6,7 +6,7 @@ import {
 
 
 const initialState = {
-  data: [],
+  list: [],
   isLoading: false,
   errorMessage: '',
 }
@@ -19,7 +19,7 @@ const receiveMoviesList = (state, action) => {
       })
     case FETCH_GENRES_LIST_SUCCESS:
       return Object.assign({}, state, {
-        data: action.data,
+        list: action.data,
         isLoading: false,
       })
     case FETCH_GENRES_LIST_FAILURE:

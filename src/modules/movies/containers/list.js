@@ -1,7 +1,7 @@
 import _ from 'lodash'
 import React, { PureComponent } from 'react'
 import InfiniteScroll from 'react-infinite-scroller'
-import { withRouter } from 'react-router-dom'
+import { withRouter, Link } from 'react-router-dom'
 import { bindActionCreators } from 'redux'
 import {
   Row,
@@ -41,7 +41,7 @@ class MoviesList extends PureComponent {
     } = this.props
 
     // console.log('\n ... movies ...', movies)
-    console.log('\n ... pagination ...', pagination)
+    // console.log('\n ... pagination ...', pagination)
     // console.log('\n ... isLoading ...', isLoading)
     // console.log('\n ... rest ...', rest)
 
@@ -97,27 +97,30 @@ class MoviesList extends PureComponent {
             {
               movies && movies.map(movie =>
                 (<Col md={6} key={movie.id}>
-                  <Card style={{ marginBottom: '25px' }}>
-                    <CardImg
-                      top
-                      width="100%"
-                      height="auto"
-                      src={`https://image.tmdb.org/t/p/w185_and_h278_bestv2/${movie.poster_path}`}
-                      alt="Card image cap"
-                    />
-                    <CardBody>
-                      <CardTitle>{movie.original_title}</CardTitle>
-                      {/*<CardSubtitle>Card subtitle</CardSubtitle>*/}
-                      <CardText>{movie.overview}
-                      </CardText>
-                    </CardBody>
-                    <hr />
-                    <ul>
-                      {movie.genre_ids && movie.genre_ids.map(id =>
-                        <li key={`genre-${id}`}>{genres[id] && genres[id].name}</li>,
-                      )}
-                    </ul>
-                  </Card>
+                  {/* eslint-disable-next-line jsx-a11y/anchor-is-valid */}
+                  <Link to={`/movie/${movie.id}`}>
+                    <Card style={{ marginBottom: '25px' }}>
+                      <CardImg
+                        top
+                        width="100%"
+                        height="auto"
+                        src={`https://image.tmdb.org/t/p/w185_and_h278_bestv2/${movie.poster_path}`}
+                        alt="Card image cap"
+                      />
+                      <CardBody>
+                        <CardTitle>{movie.original_title}</CardTitle>
+                        {/*<CardSubtitle>Card subtitle</CardSubtitle>*/}
+                        <CardText>{movie.overview}
+                        </CardText>
+                      </CardBody>
+                      <hr />
+                      <ul>
+                        {movie.genre_ids && movie.genre_ids.map(id =>
+                          <li key={`genre-${id}`}>{genres[id] && genres[id].name}</li>,
+                        )}
+                      </ul>
+                    </Card>
+                  </Link>
                   {/* eslint-disable-next-line react/jsx-closing-tag-location*/}
                 </Col>))
             }
@@ -139,8 +142,8 @@ function mapDispatchToProps(dispatch) {
 
 function mapStateToProps(state) {
   return {
-    movies: state.movies.data,
-    genres: state.genres.data,
+    movies: state.movies.list,
+    genres: state.genres.list,
     pagination: state.movies.pagination,
     isLoading: state.movies.isLoading,
   }

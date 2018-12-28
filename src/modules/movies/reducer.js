@@ -3,17 +3,22 @@ import {
   FETCH_MOVIES_LIST_SUCCESS,
   FETCH_MOVIES_LIST_FAILURE,
 
+  FETCH_MOVIE_DETAILS_START,
+  FETCH_MOVIE_DETAILS_SUCCESS,
+  FETCH_MOVIE_DETAILS_FAILURE,
+
   CLEAR_MOVIES_LIST,
 } from './action-types'
 
 
 const initialState = {
   search: '',
-  data: [],
+  list: [],
+  item: {},
   pagination: {},
   isLoading: false,
   errorMessage: '',
-}
+};
 
 const receiveMoviesList = (state, action) => {
   switch (action.type) {
@@ -23,7 +28,7 @@ const receiveMoviesList = (state, action) => {
       })
     case FETCH_MOVIES_LIST_SUCCESS:
       return Object.assign({}, state, {
-        data: action.isReplaced ? action.data : [...state.data, ...action.data],
+        list: action.isReplaced ? action.data : [...state.list, ...action.data],
         pagination: action.pagination,
         isLoading: false,
       })
@@ -36,7 +41,29 @@ const receiveMoviesList = (state, action) => {
     default:
       return state
   }
-}
+};
+
+const receiveMovieDetails = (state, action) => {
+  switch (action.type) {
+    case FETCH_MOVIE_DETAILS_START:
+      return Object.assign({}, state, {
+        isLoading: true,
+      })
+    case FETCH_MOVIE_DETAILS_SUCCESS:
+      return Object.assign({}, state, {
+        item: action.data,
+        isLoading: false,
+      })
+    case FETCH_MOVIE_DETAILS_FAILURE:
+      return Object.assign({}, state, {
+        errorMessage: action.errors,
+        isLoading: false,
+      })
+
+    default:
+      return state
+  }
+};
 
 export default function reducer(state = initialState, action) {
   switch (action.type) {
@@ -45,9 +72,14 @@ export default function reducer(state = initialState, action) {
     case FETCH_MOVIES_LIST_FAILURE:
       return receiveMoviesList(state, action)
 
+    case FETCH_MOVIE_DETAILS_START:
+    case FETCH_MOVIE_DETAILS_SUCCESS:
+    case FETCH_MOVIE_DETAILS_FAILURE:
+      return receiveMovieDetails(state, action)
+
     case CLEAR_MOVIES_LIST:
       return Object.assign({}, state, {
-        data: [],
+        list: [],
         pagination: {},
       })
     default:
