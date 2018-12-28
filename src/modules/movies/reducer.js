@@ -23,7 +23,7 @@ const receiveMoviesList = (state, action) => {
       })
     case FETCH_MOVIES_LIST_SUCCESS:
       return Object.assign({}, state, {
-        data: action.data,
+        data: action.isReplaced ? action.data : [...state.data, ...action.data],
         pagination: action.pagination,
         isLoading: false,
       })

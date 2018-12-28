@@ -1,5 +1,6 @@
-// import _ from 'lodash'
+import _ from 'lodash'
 import React, { PureComponent } from 'react'
+import InfiniteScroll from 'react-infinite-scroller'
 import { withRouter } from 'react-router-dom'
 import { bindActionCreators } from 'redux'
 import {
@@ -17,7 +18,7 @@ import {
 } from 'reactstrap'
 
 import { connect } from 'react-redux'
-import { fetchMoviesList, searchMoviesList } from '../actions/list'
+import { fetchMoviesList, searchMoviesList, loadMoreMovies } from '../actions/list'
 import { fetchGenresList } from '../../genres/actions/list'
 import { ContentTemplate } from '../../../ui'
 
@@ -36,11 +37,11 @@ class MoviesList extends PureComponent {
 
   render() {
     const {
-      movies, genres, searchMovies, /* pagination, isLoading*/
+      movies, genres, searchMovies, loadMore, pagination, /* isLoading*/
     } = this.props
 
     // console.log('\n ... movies ...', movies)
-    // console.log('\n ... pagination ...', pagination)
+    console.log('\n ... pagination ...', pagination)
     // console.log('\n ... isLoading ...', isLoading)
     // console.log('\n ... rest ...', rest)
 
@@ -70,35 +71,58 @@ class MoviesList extends PureComponent {
             </Button>
           </InputGroupAddon>
         </InputGroup>
-        <Row>
-          {
-            movies.map(movie =>
-              (<Col md={6} key={movie.id}>
-                <Card style={{ marginBottom: '25px' }}>
-                  <CardImg
-                    top
-                    width="100%"
-                    height="auto"
-                    src={`https://image.tmdb.org/t/p/w185_and_h278_bestv2/${movie.poster_path}`}
-                    alt="Card image cap"
-                  />
-                  <CardBody>
-                    <CardTitle>{movie.original_title}</CardTitle>
-                    {/*<CardSubtitle>Card subtitle</CardSubtitle>*/}
-                    <CardText>{movie.overview}
-                    </CardText>
-                  </CardBody>
-                  <hr />
-                  <ul>
-                    {movie.genre_ids && movie.genre_ids.map(id =>
-                      <li key={`genre-${id}`}>{genres[id] && genres[id].name}</li>,
-                    )}
-                  </ul>
-                </Card>
-                {/* eslint-disable-next-line react/jsx-closing-tag-location*/}
-              </Col>))
-          }
-        </Row>
+        <InfiniteScroll
+          element="div"
+          style={{
+            display: 'table-row-group',
+            verticalAlign: 'middle',
+            borderColor: 'inherit',
+          }}
+          pageStart={0}
+          threshold={10}
+          loadMore={() => {
+            const nextPage = parseInt(pagination.page, 10) + 1
+
+            if (this.fetchedPage !== nextPage) {
+              setTimeout(() => {
+                loadMore(this.state.searchValue, parseInt(pagination.page, 10) + 1)
+              }, 300)
+              this.fetchedPage = nextPage
+            }
+          }}
+          loader="Loading..."
+          hasMore={!_.isEmpty(pagination) && (pagination.page < pagination.totalPages)}
+        >
+          <Row>
+            {
+              movies && movies.map(movie =>
+                (<Col md={6} key={movie.id}>
+                  <Card style={{ marginBottom: '25px' }}>
+                    <CardImg
+                      top
+                      width="100%"
+                      height="auto"
+                      src={`https://image.tmdb.org/t/p/w185_and_h278_bestv2/${movie.poster_path}`}
+                      alt="Card image cap"
+                    />
+                    <CardBody>
+                      <CardTitle>{movie.original_title}</CardTitle>
+                      {/*<CardSubtitle>Card subtitle</CardSubtitle>*/}
+                      <CardText>{movie.overview}
+                      </CardText>
+                    </CardBody>
+                    <hr />
+                    <ul>
+                      {movie.genre_ids && movie.genre_ids.map(id =>
+                        <li key={`genre-${id}`}>{genres[id] && genres[id].name}</li>,
+                      )}
+                    </ul>
+                  </Card>
+                  {/* eslint-disable-next-line react/jsx-closing-tag-location*/}
+                </Col>))
+            }
+          </Row>
+        </InfiniteScroll>
       </ContentTemplate>
     )
   }
@@ -109,6 +133,7 @@ function mapDispatchToProps(dispatch) {
     fetchMovies: bindActionCreators(fetchMoviesList, dispatch),
     searchMovies: bindActionCreators(searchMoviesList, dispatch),
     fetchGenres: bindActionCreators(fetchGenresList, dispatch),
+    loadMore: bindActionCreators(loadMoreMovies, dispatch),
   }
 }
 

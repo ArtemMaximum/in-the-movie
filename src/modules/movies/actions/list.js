@@ -42,9 +42,9 @@ export function fetchMoviesList(page = 1, isReplaced = false) {
 }
 
 
-export function searchMoviesList(query, isReplaced = true) {
+export function searchMoviesList(query, page = 1, isReplaced = true) {
   return (dispatch) => {
-    if (query.length < 1) {
+    if (query && query.length < 1) {
       dispatch({
         type: CLEAR_MOVIES_LIST,
       });
@@ -58,6 +58,7 @@ export function searchMoviesList(query, isReplaced = true) {
     return api.get('/search/movie', {
       params: {
         query,
+        page,
       },
     }).then(({ data }) => {
       if (!data.status_code) {
@@ -81,4 +82,13 @@ export function searchMoviesList(query, isReplaced = true) {
   };
 }
 
-export default [fetchMoviesList, searchMoviesList];
+export function loadMoreMovies(query, page = 1, isReplaced = false) {
+  return (dispatch) => {
+    if (query.length < 1) {
+      return dispatch(fetchMoviesList(page))
+    }
+    return dispatch(searchMoviesList(query, page, isReplaced))
+  }
+}
+
+export default [fetchMoviesList, searchMoviesList, loadMoreMovies];
