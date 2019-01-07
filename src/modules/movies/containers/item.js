@@ -1,3 +1,4 @@
+import _ from 'lodash';
 import shortid from 'shortid'
 import { inject, observer } from 'mobx-react';
 import React, { Component } from 'react';
