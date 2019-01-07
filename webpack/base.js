@@ -41,6 +41,10 @@ module.exports = {
         exclude: [/bower_components/, /node_modules/, /styles/],
         loader: 'babel-loader',
         include: resolve(__dirname, '..', 'src'),
+        query: {
+          presets: ['es2015', 'react'],
+          plugins: ['transform-decorators-legacy', 'transform-class-properties'],
+        },
       },
       {
         test: /\.css$/,

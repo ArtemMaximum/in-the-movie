@@ -1,52 +1,55 @@
-import _ from 'lodash'
 import shortid from 'shortid'
-import React, { PureComponent } from 'react'
-import InfiniteScroll from 'react-infinite-scroller'
-import { Link, withRouter } from 'react-router-dom'
-import { bindActionCreators } from 'redux'
+import { inject, observer } from 'mobx-react';
+import React, { Component } from 'react';
+import InfiniteScroll from 'react-infinite-scroller';
+import { withRouter, Link } from 'react-router-dom';
 import {
   Row,
   Col,
   Jumbotron,
-  CardImg, Card, CardBody, CardTitle, CardText,
-} from 'reactstrap'
+  Card,
+  CardImg,
+  CardBody,
+  CardTitle /*CardSubtitle, */,
+  CardText,
+} from 'reactstrap';
 
-import { connect } from 'react-redux'
-import { fetchMovieDetails } from '../actions/item'
-import { fetchRecommendedMoviesList, loadMoreRecommendationsList } from '../actions/list'
-import { ContentTemplate } from '../../../ui'
+import { ContentTemplate } from '../../../ui';
 
-
-class MovieDetails extends PureComponent {
+class MovieDetails extends Component {
   constructor(props) {
-    super(props)
-
-    this.state = {}
+    super(props);
   }
 
   componentDidMount() {
-    const { fetchMovie, fetchRecommendedMovies, match: { params: { movieId } } } = this.props;
-    fetchMovie(movieId)
-    fetchRecommendedMovies(movieId, 1, true)
+    const {
+      movieStore,
+      match: {
+        params: { movieId },
+      },
+    } = this.props;
+    movieStore.getRecommendationsList(movieId, 1, true)
+    movieStore.getMovieDetails(movieId);
   }
 
   componentWillReceiveProps(nextProps) {
-    const { fetchMovie, fetchRecommendedMovies, match: { params: { movieId } } } = this.props;
+    const { movieStore, match: { params: { movieId } } } = this.props;
     if (movieId !== nextProps.match.params.movieId) {
-      fetchMovie(nextProps.match.params.movieId)
-      fetchRecommendedMovies(nextProps.match.params.movieId, 1, true)
+      movieStore.getRecommendationsList(nextProps.match.params.movieId, 1, true)
+      movieStore.getMovieDetails(nextProps.match.params.movieId);
     }
   }
 
   render() {
     const {
-      movie, /*isLoading,*/
-      recommendedList,
-      loadMoreRecommendations,
-      pagination,
-      match: { params: { movieId } },
-      /*isRecommendationsLoading,*/
-    } = this.props
+      movieStore,
+      movieStore: { movie, recommendedMovies, recommendedListPagination },
+      match: {
+        params: { movieId },
+      },
+    } = this.props;
+
+    // movieStore.getRecommendationsList();
 
     return (
       <ContentTemplate>
@@ -65,15 +68,17 @@ class MovieDetails extends PureComponent {
               <br />
               <p className="lead">{movie.overview}</p>
               <hr className="my-2" />
-              <p>{movie.title} - {movie.tagline}</p>
+              <p>
+                {movie.title} - {movie.tagline}
+              </p>
               <hr className="my-2" />
               <ul>
-                {movie && movie.genres && movie.genres.map(genre =>
-                  <li key={`genre-${genre.id}`}>{genre.name}</li>,
-                )}
+                {movie.genres &&
+                  movie.genres.map(genre => <li key={`genre-${genre.id}`}>{genre.name}</li>)}
               </ul>
             </Jumbotron>
-            <br /><br />
+            <br />
+            <br />
             <h2>Recommended Movies:</h2>
 
             <InfiniteScroll
@@ -86,22 +91,28 @@ class MovieDetails extends PureComponent {
               pageStart={0}
               threshold={10}
               loadMore={() => {
-                const nextPage = parseInt(pagination.page, 10) + 1
+                const nextPage = parseInt(recommendedListPagination.page, 10) + 1;
 
                 if (this.fetchedRecommendedPage !== nextPage) {
                   setTimeout(() => {
-                    loadMoreRecommendations(movieId, parseInt(pagination.page, 10) + 1)
-                  }, 300)
-                  this.fetchedRecommendedPage = nextPage
+                    movieStore.getRecommendationsList(
+                      movieId,
+                      parseInt(recommendedListPagination.page, 10) + 1,
+                    );
+                  }, 300);
+                  this.fetchedRecommendedPage = nextPage;
                 }
               }}
               loader="Loading..."
-              hasMore={!_.isEmpty(pagination) && (pagination.page < pagination.totalPages)}
+              hasMore={
+                !_.isEmpty(recommendedListPagination) &&
+                recommendedListPagination.page < recommendedListPagination.totalPages
+              }
             >
               <Row>
-                {
-                  recommendedList && recommendedList.map(recommendedMovie =>
-                    (<Col md={6} key={`recommended-${recommendedMovie.id}-${shortid.generate()}`}>
+                {recommendedMovies &&
+                  recommendedMovies.map(recommendedMovie => (
+                    <Col md={6} key={`recommended-${recommendedMovie.id}-${shortid.generate()}`}>
                       {/* eslint-disable-next-line jsx-a11y/anchor-is-valid */}
                       <Link to={`/movie/${recommendedMovie.id}`}>
                         <Card style={{ marginBottom: '25px' }}>
@@ -109,45 +120,28 @@ class MovieDetails extends PureComponent {
                             top
                             width="100%"
                             height="auto"
-                            src={`https://image.tmdb.org/t/p/w185_and_h278_bestv2/${recommendedMovie.poster_path}`}
+                            src={`https://image.tmdb.org/t/p/w185_and_h278_bestv2/${
+                              recommendedMovie.poster_path
+                            }`}
                             alt="Card image cap"
                           />
                           <CardBody>
                             <CardTitle>{recommendedMovie.original_title}</CardTitle>
                             {/*<CardSubtitle>Card subtitle</CardSubtitle>*/}
-                            <CardText>{recommendedMovie.overview}
-                            </CardText>
+                            <CardText>{recommendedMovie.overview}</CardText>
                           </CardBody>
                         </Card>
                       </Link>
                       {/* eslint-disable-next-line react/jsx-closing-tag-location*/}
-                    </Col>))
-                }
+                    </Col>
+                  ))}
               </Row>
             </InfiniteScroll>
           </Col>
         </Row>
       </ContentTemplate>
-    )
+    );
   }
 }
 
-function mapDispatchToProps(dispatch) {
-  return {
-    fetchMovie: bindActionCreators(fetchMovieDetails, dispatch),
-    fetchRecommendedMovies: bindActionCreators(fetchRecommendedMoviesList, dispatch),
-    loadMoreRecommendations: bindActionCreators(loadMoreRecommendationsList, dispatch),
-  }
-}
-
-function mapStateToProps(state) {
-  return {
-    movie: state.movies.item,
-    recommendedList: state.movies.recommendedList,
-    pagination: state.movies.recommendedListPagination,
-    isLoading: state.movies.isLoading,
-    isRecommendationsLoading: state.movies.isRecommendationsLoading,
-  }
-}
-
-export default withRouter(connect(mapStateToProps, mapDispatchToProps)(MovieDetails))
+export default inject('movieStore')(withRouter(observer(MovieDetails)));

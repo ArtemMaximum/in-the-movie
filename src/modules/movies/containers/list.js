@@ -1,49 +1,43 @@
-import _ from 'lodash'
-import React, { PureComponent } from 'react'
-import InfiniteScroll from 'react-infinite-scroller'
-import { withRouter, Link } from 'react-router-dom'
-import { bindActionCreators } from 'redux'
+import _ from 'lodash';
+import { observer, inject } from 'mobx-react';
+import React, { Component } from 'react';
+import InfiniteScroll from 'react-infinite-scroller';
+import { withRouter, Link } from 'react-router-dom';
 import {
   Row,
   Col,
   Card,
   CardImg,
   CardBody,
-  CardTitle, /*CardSubtitle, */
+  CardTitle /*CardSubtitle, */,
   CardText,
   InputGroup,
   Input,
   InputGroupAddon,
   Button,
-} from 'reactstrap'
+} from 'reactstrap';
 
-import { connect } from 'react-redux'
-import { fetchMoviesList, searchMoviesList, loadMoreMovies } from '../actions/list'
-import { fetchGenresList } from '../../genres/actions/list'
-import { ContentTemplate } from '../../../ui'
+import { ContentTemplate } from '../../../ui';
 
-
-class MoviesList extends PureComponent {
+class MoviesList extends Component {
   constructor(props) {
-    super(props)
+    super(props);
 
-    this.state = { searchValue: '' }
+    this.state = { searchValue: '' };
   }
 
   componentDidMount() {
-    this.props.fetchMovies()
-    this.props.fetchGenres()
+    const { genreStore, movieStore } = this.props;
+    movieStore.getMoviesList();
+    genreStore.getGenresList();
   }
 
   render() {
     const {
-      movies, genres, searchMovies, loadMore, pagination, /* isLoading*/
-    } = this.props
-
-    // console.log('\n ... movies ...', movies)
-    // console.log('\n ... pagination ...', pagination)
-    // console.log('\n ... isLoading ...', isLoading)
-    // console.log('\n ... rest ...', rest)
+      movieStore,
+      genreStore: { genres },
+      movieStore: { movies, pagination },
+    } = this.props;
 
     return (
       <ContentTemplate>
@@ -56,15 +50,15 @@ class MoviesList extends PureComponent {
             onChange={(e) => {
               this.setState({
                 searchValue: e.target.value,
-              })
-              searchMovies(e.target.value)
+              });
+              movieStore.searchMoviesList(e.target.value);
             }}
           />
           <InputGroupAddon addonType="append">
             <Button
               color="inverse"
               onClick={() => {
-                searchMovies(this.state.searchValue)
+                movieStore.searchMoviesList(this.state.searchValue);
               }}
             >
               Найти
@@ -81,22 +75,25 @@ class MoviesList extends PureComponent {
           pageStart={0}
           threshold={10}
           loadMore={() => {
-            const nextPage = parseInt(pagination.page, 10) + 1
+            const nextPage = parseInt(pagination.page, 10) + 1;
 
             if (this.fetchedPage !== nextPage) {
               setTimeout(() => {
-                loadMore(this.state.searchValue, parseInt(pagination.page, 10) + 1)
-              }, 300)
-              this.fetchedPage = nextPage
+                movieStore.loadMoreMovies(
+                  this.state.searchValue,
+                  parseInt(pagination.page, 10) + 1,
+                );
+              }, 300);
+              this.fetchedPage = nextPage;
             }
           }}
           loader="Loading..."
-          hasMore={!_.isEmpty(pagination) && (pagination.page < pagination.totalPages)}
+          hasMore={!_.isEmpty(pagination) && pagination.page < pagination.totalPages}
         >
           <Row>
-            {
-              movies && movies.map(movie =>
-                (<Col md={6} key={movie.id}>
+            {movies &&
+              movies.map(movie => (
+                <Col md={6} key={movie.id}>
                   {/* eslint-disable-next-line jsx-a11y/anchor-is-valid */}
                   <Link to={`/movie/${movie.id}`}>
                     <Card style={{ marginBottom: '25px' }}>
@@ -110,43 +107,25 @@ class MoviesList extends PureComponent {
                       <CardBody>
                         <CardTitle>{movie.original_title}</CardTitle>
                         {/*<CardSubtitle>Card subtitle</CardSubtitle>*/}
-                        <CardText>{movie.overview}
-                        </CardText>
+                        <CardText>{movie.overview}</CardText>
                       </CardBody>
                       <hr />
                       <ul>
-                        {movie.genre_ids && movie.genre_ids.map(id =>
-                          <li key={`genre-${id}`}>{genres[id] && genres[id].name}</li>,
-                        )}
+                        {movie.genre_ids &&
+                          movie.genre_ids.map(id => (
+                            <li key={`genre-${id}`}>{genres[id] && genres[id].name}</li>
+                          ))}
                       </ul>
                     </Card>
                   </Link>
                   {/* eslint-disable-next-line react/jsx-closing-tag-location*/}
-                </Col>))
-            }
+                </Col>
+              ))}
           </Row>
         </InfiniteScroll>
       </ContentTemplate>
-    )
+    );
   }
 }
 
-function mapDispatchToProps(dispatch) {
-  return {
-    fetchMovies: bindActionCreators(fetchMoviesList, dispatch),
-    searchMovies: bindActionCreators(searchMoviesList, dispatch),
-    fetchGenres: bindActionCreators(fetchGenresList, dispatch),
-    loadMore: bindActionCreators(loadMoreMovies, dispatch),
-  }
-}
-
-function mapStateToProps(state) {
-  return {
-    movies: state.movies.list,
-    genres: state.genres.list,
-    pagination: state.movies.pagination,
-    isLoading: state.movies.isLoading,
-  }
-}
-
-export default withRouter(connect(mapStateToProps, mapDispatchToProps)(MoviesList))
+export default inject('genreStore', 'movieStore')(withRouter(observer(MoviesList)));

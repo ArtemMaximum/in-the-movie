@@ -12,7 +12,9 @@
       "root": ["./src"],
       "extensions": [".js", ".svg"]
     }],
-    "inline-react-svg"
+    "inline-react-svg",
+    "transform-flow-strip-types",
+    "transform-decorators-legacy"
   ],
   "env": {
     "production": {
